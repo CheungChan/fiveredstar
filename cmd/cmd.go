@@ -5,7 +5,7 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/cheungchan/tools/logger"
+	"github.com/cheungchan/fiveredstar/logger"
 	"os"
 	"os/exec"
 	"os/user"

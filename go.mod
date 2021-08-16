@@ -1,4 +1,4 @@
-module github.com/cheungchan/tools
+module github.com/cheungchan/fiveredstar
 
 go 1.15
 
