@@ -1,5 +1,7 @@
 .idea/
 logs/
 *.log
-test_zip/
-test_unzip/
+test_zip_dir/
+test_unzip_dir/
+test_zip_flat/
+test_unzip_flat/

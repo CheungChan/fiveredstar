@@ -1,17 +1,30 @@
 package zip
 
-import "testing"
+import (
+    logger2 "github.com/cheungchan/fiveredstar/logger"
+    "testing"
+)
 
 func TestZip(t *testing.T) {
-    t.Log("开始压缩")
-    err := Zip("./test_zip/raw_files.zip", "test_raw_files", true)
+    _ = logger2.New("logs","zip_test.log",3,30*1024*1024,1)
+    t.Log("开始测试带文件夹的压缩")
+    err := Zip("./test_zip_dir/raw_files.zip", "test_raw_files", true,false)
     if err != nil {
         t.Error(err)
     }
-    t.Log("开始解压")
-    err = UnZip("./test_unzip", "./test_zip/raw_files.zip", true)
+    t.Log("开始测试带文件夹的解压")
+    err = UnZip("./test_unzip_dir", "./test_zip_dir/raw_files.zip", true)
     if err != nil {
         t.Error(err)
     }
-
+    t.Log("开始测试不带文件夹的压缩")
+    err = Zip("./test_zip_flat/3.zip", "test_raw_files/3", true,true)
+    if err != nil {
+        t.Error(err)
+    }
+    t.Log("开始测试不带文件夹的解压")
+    err = UnZip("./test_unzip_flat", "./test_zip_flat/3.zip", true)
+    if err != nil {
+        t.Error(err)
+    }
 }

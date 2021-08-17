@@ -12,7 +12,12 @@ import (
     "strings"
 )
 
-func Zip(dst, src string, debug bool) (err error) {
+// Zip 压缩文件
+// dst 要压缩为的文件名
+// src 要压缩的目录
+// debug 是否开启debug模式
+// flat  压缩完里面是否要包含文件夹
+func Zip(dst, src string, debug bool, flat bool) (err error) {
     dd := path.Dir(dst)
     if !cmd.FileExists(dd) {
         os.MkdirAll(dd, os.ModePerm)
@@ -53,6 +58,13 @@ func Zip(dst, src string, debug bool) (err error) {
 
         // 替换文件信息中的文件名
         fh.Name = strings.TrimPrefix(path, string(filepath.Separator))
+        if flat && fi.IsDir(){
+            logger.Logger.Debug().Msgf("%s是文件夹，不压缩",fi.Name())
+            return nil
+        }
+        if flat {
+            fh.Name = filepath.Base(fh.Name)
+        }
 
         // 这步开始没有加，会发现解压的时候说它不是个目录
         if fi.IsDir() {
@@ -85,7 +97,7 @@ func Zip(dst, src string, debug bool) (err error) {
         }
         // 输出压缩的内容
         if debug {
-            logger.Logger.Debug().Msgf("成功压缩文件： %s, 共写入了 %d 个字符的数据\n", path, n)
+            logger.Logger.Debug().Msgf("成功压缩文件： %s, 共写入了 %d 个字符的数据", path, n)
         }
 
         return nil
@@ -148,7 +160,7 @@ func UnZip(dst, src string, debug bool) (err error) {
 
         // 将解压的结果输出
         if debug {
-            logger.Logger.Debug().Msgf("成功解压 %s ，共写入了 %d 个字符的数据\n", path, n)
+            logger.Logger.Debug().Msgf("成功解压 %s ，共写入了 %d 个字符的数据", path, n)
         }
 
         // 因为是在循环中，无法使用 defer ，直接放在最后
