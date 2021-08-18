@@ -11,7 +11,7 @@ import (
 func TestGinMiddleware(t *testing.T) {
 	Logger := New("logs", "test_gin_logger.log", 3, 30*1024*1024, 30)
 	r := gin.Default()
-	r.Use(GinMiddleware("gin"))
+	r.Use(GinMiddleware("test_gin"))
 	r.GET("/", func(c *gin.Context) {
 		Logger.Info().Msg("gin view log")
 		c.String(200, "Hello World")

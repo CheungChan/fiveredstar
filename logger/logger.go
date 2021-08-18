@@ -16,7 +16,7 @@ var Logger zerolog.Logger
 func New(directory string, fileName string, maxBackups int, maxSize int, maxAge int) zerolog.Logger {
 	Logger = log.Output(zerolog.MultiLevelWriter(
 		zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339},
-		newRollingFile(directory, fileName, maxBackups, maxSize, maxAge))).With().Timestamp().Logger().With().Caller().Logger()
+		zerolog.ConsoleWriter{Out:newRollingFile(directory, fileName, maxBackups, maxSize, maxAge),NoColor: true,TimeFormat: time.RFC3339})).With().Timestamp().Logger().With().Caller().Logger()
 	return Logger
 }
 
