@@ -130,11 +130,11 @@ func UnZip(dst, src string, debug bool) (err error) {
 
     // 遍历 zr ，将文件写入到磁盘
     for _, file := range zr.File {
-        path := filepath.Join(dst, file.Name)
+        p := filepath.Join(dst, file.Name)
 
         // 如果是目录，就创建目录
         if file.FileInfo().IsDir() {
-            if err := os.MkdirAll(path, file.Mode()); err != nil {
+            if err := os.MkdirAll(p, file.Mode()); err != nil {
                 return err
             }
             // 因为是目录，跳过当前循环，因为后面都是文件的处理
@@ -148,7 +148,7 @@ func UnZip(dst, src string, debug bool) (err error) {
         }
 
         // 创建要写出的文件对应的 Write
-        fw, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, file.Mode())
+        fw, err := os.OpenFile(p, os.O_CREATE|os.O_RDWR|os.O_TRUNC, file.Mode())
         if err != nil {
             return err
         }
@@ -160,7 +160,7 @@ func UnZip(dst, src string, debug bool) (err error) {
 
         // 将解压的结果输出
         if debug {
-            logger.Logger.Debug().Msgf("成功解压 %s ，共写入了 %d 个字符的数据", path, n)
+            logger.Logger.Debug().Msgf("成功解压 %s ，共写入了 %d 个字符的数据", p, n)
         }
 
         // 因为是在循环中，无法使用 defer ，直接放在最后

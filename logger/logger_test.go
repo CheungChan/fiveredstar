@@ -2,6 +2,7 @@ package logger
 
 import (
 	"github.com/gin-gonic/gin"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -9,7 +10,7 @@ import (
 )
 
 func TestGinMiddleware(t *testing.T) {
-	Logger := New("logs", "test_gin_logger.log", 3, 30*1024*1024, 30)
+	Logger := New("logs", "test_gin_logger.log", true,3, 30*1024*1024, 30)
 	r := gin.Default()
 	r.Use(GinMiddleware("test_gin"))
 	r.GET("/", func(c *gin.Context) {
@@ -24,7 +25,12 @@ func TestGinMiddleware(t *testing.T) {
 	if err != nil {
 		return
 	}
-	defer res.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			Logger.Error().Msgf("%+v",err)
+		}
+	}(res.Body)
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return
@@ -33,6 +39,6 @@ func TestGinMiddleware(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	Logger := New("logs", "test_logger.log", 3, 30*1024*1024, 30)
+	Logger := New("logs", "test_logger.log", true,3, 30*1024*1024, 30)
 	Logger.Info().Msg("Hello")
 }

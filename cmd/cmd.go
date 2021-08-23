@@ -5,8 +5,8 @@ import (
     "context"
     "crypto/md5"
     "encoding/hex"
+    "github.com/cheungchan/fiveredstar/io"
     "github.com/cheungchan/fiveredstar/logger"
-    "os"
     "os/exec"
     "os/user"
     "strings"
@@ -16,11 +16,11 @@ import (
 func GetShellOutput(ctx context.Context, cmdStr string, debug bool) chan string {
     // 获取shell输出的标准输出和标准错误
     outputChanel := make(chan string, 10)
-    go runShellAync(ctx, cmdStr, outputChanel, debug)
+    go runShellAsync(ctx, cmdStr, outputChanel, debug)
     return outputChanel
 
 }
-func GetShellOutputOnce(ctx context.Context, cmdStr string, debug bool) (string, error) {
+func GetShellOutputOnce(cmdStr string, debug bool) (string, error) {
     // 同步的获取shell输出
     c := exec.Command("bash", "-c", cmdStr)
     if debug {
@@ -47,7 +47,7 @@ func HandleOutputChannel(ch chan string, debug bool, op func(line string)) {
         logger.Logger.Debug().Msgf("处理output channel完成")
     }
 }
-func runShellAync(ctx context.Context, cmdStr string, outputChanel chan string, debug bool) {
+func runShellAsync(ctx context.Context, cmdStr string, outputChanel chan string, debug bool) {
     defer func() {
         if debug {
             logger.Logger.Debug().Msgf("关闭outputChanel,%s", cmdStr)
@@ -114,15 +114,7 @@ func runShellAync(ctx context.Context, cmdStr string, outputChanel chan string, 
     wg.Wait()
 }
 func FileExists(path string) bool {
-    //文件是否存在
-    _, err := os.Stat(path) //os.Stat获取文件信息
-    if err != nil {
-        if os.IsExist(err) {
-            return true
-        }
-        return false
-    }
-    return true
+    return io.FileIsExisted(path)
 }
 
 func IsDev(whiteUserName ...string) (r bool) {

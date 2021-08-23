@@ -14,7 +14,7 @@ func TestGetShellOutput(t *testing.T) {
 }
 
 func TestGetShellOutputOnce(t *testing.T) {
-	out, err := GetShellOutputOnce(context.TODO(),"ls -l",true)
+	out, err := GetShellOutputOnce("ls -l",true)
 	if err!=nil{
 		t.Error(err)
 		return
