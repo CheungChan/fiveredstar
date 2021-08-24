@@ -10,7 +10,7 @@ import (
 )
 
 func TestGinMiddleware(t *testing.T) {
-	Logger := New("logs", "test_gin_logger.log", true,3, 30*1024*1024, 30)
+	Logger := New("logs", "test_gin_logger.log", true, 3, 10, 1)
 	r := gin.Default()
 	r.Use(GinMiddleware("test_gin"))
 	r.GET("/", func(c *gin.Context) {
@@ -28,7 +28,7 @@ func TestGinMiddleware(t *testing.T) {
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			Logger.Error().Msgf("%+v",err)
+			Logger.Error().Msgf("%+v", err)
 		}
 	}(res.Body)
 	b, err := ioutil.ReadAll(res.Body)
@@ -39,6 +39,6 @@ func TestGinMiddleware(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	Logger := New("logs", "test_logger.log", true,3, 30*1024*1024, 30)
+	Logger := New("logs", "test_logger.log", true, 3, 10, 1)
 	Logger.Info().Msg("Hello")
 }

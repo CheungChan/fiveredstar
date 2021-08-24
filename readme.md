@@ -15,7 +15,7 @@ import (
 var gLogger zerolog.Logger
 
 // 脚本日志初始化
-gLogger = logger.New(path, "myProject.log", true, 20, 10*1024*1024, 1)
+gLogger = logger.New(path, "myProject.log", true, 20, 10, 1)
 // 打印日志
 logger.Logger.Info().Msgf("执行%s,超时时间%ds", cmdStr, timeout)
 
