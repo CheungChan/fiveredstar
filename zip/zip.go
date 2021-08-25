@@ -4,7 +4,7 @@ import (
     "archive/zip"
     "fmt"
     "github.com/cheungchan/fiveredstar/cmd"
-    "github.com/cheungchan/fiveredstar/logger"
+    "github.com/gogf/gf/os/glog"
     "io"
     "os"
     "path"
@@ -22,7 +22,7 @@ func Zip(dst, src string, debug bool, flat bool) (err error) {
     if !cmd.FileExists(dd) {
         os.MkdirAll(dd, os.ModePerm)
         if debug {
-            logger.Logger.Debug().Msgf("%s文件夹不存在，创建文件夹", dd)
+            glog.Debugf("%s文件夹不存在，创建文件夹", dd)
         }
     }
     if !cmd.FileExists(src) {
@@ -40,7 +40,7 @@ func Zip(dst, src string, debug bool, flat bool) (err error) {
     defer func() {
         // 检测一下是否成功关闭
         if err := zw.Close(); err != nil {
-            logger.Logger.Fatal().Msgf("%+v", err)
+            glog.Fatalf("%+v", err)
         }
     }()
 
@@ -59,7 +59,7 @@ func Zip(dst, src string, debug bool, flat bool) (err error) {
         // 替换文件信息中的文件名
         fh.Name = strings.TrimPrefix(path, string(filepath.Separator))
         if flat && fi.IsDir(){
-            logger.Logger.Debug().Msgf("%s是文件夹，不压缩",fi.Name())
+            glog.Debugf("%s是文件夹，不压缩",fi.Name())
             return nil
         }
         if flat {
@@ -97,7 +97,7 @@ func Zip(dst, src string, debug bool, flat bool) (err error) {
         }
         // 输出压缩的内容
         if debug {
-            logger.Logger.Debug().Msgf("成功压缩文件： %s, 共写入了 %d 个字符的数据", path, n)
+            glog.Debugf("成功压缩文件： %s, 共写入了 %d 个字符的数据", path, n)
         }
 
         return nil
@@ -107,7 +107,7 @@ func UnZip(dst, src string, debug bool) (err error) {
     if !cmd.FileExists(dst) {
         os.MkdirAll(dst, os.ModePerm)
         if debug {
-            logger.Logger.Debug().Msgf("%s文件夹不存在，创建文件夹", dst)
+            glog.Debugf("%s文件夹不存在，创建文件夹", dst)
         }
     }
     if !cmd.FileExists(src) {
@@ -160,7 +160,7 @@ func UnZip(dst, src string, debug bool) (err error) {
 
         // 将解压的结果输出
         if debug {
-            logger.Logger.Debug().Msgf("成功解压 %s ，共写入了 %d 个字符的数据", p, n)
+            glog.Debugf("成功解压 %s ，共写入了 %d 个字符的数据", p, n)
         }
 
         // 因为是在循环中，无法使用 defer ，直接放在最后

@@ -6,7 +6,7 @@ import (
 )
 
 func TestZip(t *testing.T) {
-	_ = logger2.New("logs", "zip_test.log", true, 3, 10, 1)
+	_ = logger2.InitLog("logs", "zip_test.log", true, 3, 10, 1)
 	t.Log("开始测试带文件夹的压缩")
 	err := Zip("./test_zip_dir/raw_files.zip", "test_raw_files", true, false)
 	if err != nil {

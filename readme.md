@@ -9,24 +9,27 @@ import (
     "github.com/cheungchan/fiveredstar/logger"
     "github.com/gin-gonic/gin"
     "github.com/rs/zerolog"
+    "github.com/gogf/gf/os/glog"
     "fmt"
 )
 
-var gLogger zerolog.Logger
+
 
 // 脚本日志初始化
-gLogger = logger.New(path, "myProject.log", true, 20, 10, 1)
+InitLog("logs/test_logger", "10M", false)
+
 // 打印日志
-logger.Logger.Info().Msgf("执行%s,超时时间%ds", cmdStr, timeout)
+glog.Infof("执行%s,超时时间%ds", cmdStr, timeout)
 
 // 在gin里使用日志
-r := gin.Default()
+r := gin.New()
 r.Use(GinMiddleware("test_gin"))
 ```
 #### cmd
 ```go
 import (
 "github.com/cheungchan/fiveredstar/cmd"
+"fmt"
 )
 
 // 执行持续输出的命令  命令的标准输出和标准错误会重定向的out这个channel里，通过cmd.HandleOutputChannel来按行迭代channel里面的line

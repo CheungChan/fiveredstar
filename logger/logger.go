@@ -1,97 +1,79 @@
 package logger
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
-	"gopkg.in/natefinch/lumberjack.v2"
-	"io"
-	"os"
-	"path"
-	"time"
+    "github.com/gin-gonic/gin"
+    "github.com/gogf/gf/frame/g"
+    "github.com/gogf/gf/os/glog"
+    "time"
 )
 
-var Logger zerolog.Logger
 
-func New(directory string, fileName string, withCaller bool, maxBackups int, maxSize int, maxAge int) zerolog.Logger {
-	Logger = log.Output(zerolog.MultiLevelWriter(
-		zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339},
-		zerolog.ConsoleWriter{Out: newRollingFile(directory, fileName, maxBackups, maxSize, maxAge), NoColor: true, TimeFormat: time.RFC3339})).With().Timestamp().Logger()
-	if withCaller {
-		Logger = Logger.With().Caller().Logger()
-	}
-	return Logger
-}
-
-func newRollingFile(directory string, fileName string, maxBackups int, maxSize int, maxAge int) io.Writer {
-	if err := os.MkdirAll(directory, 0744); err != nil {
-		log.Error().Err(err).Str("path", directory).Msg("can't create log directory")
-		return nil
-	}
-
-	return &lumberjack.Logger{
-		Filename:   path.Join(directory, fileName),
-		MaxBackups: maxBackups, // files
-		MaxSize:    maxSize,    // Mb
-		MaxAge:     maxAge,     // days
-		LocalTime:  true,
-	}
+func InitLog(logDirectory string, rotateSize string,writerColorEnable bool) {
+    err := glog.SetConfigWithMap(g.Map{
+        "path":                logDirectory,
+        "file":                "{Y-m-d}.log", // 日志文件格式。默认为"{Y-m-d}.log"
+        "level":               "all",
+        "stdout":              true,
+        "StStatus":            1,
+        "rotateSize":          rotateSize,
+        "rotateExpire":        24 * time.Hour,
+        "writerColorEnable":   writerColorEnable,
+    })
+    if err != nil {
+        glog.Error("日志配置错误")
+    }
 }
 
 type ginHands struct {
-	SerName    string
-	Path       string
-	Latency    time.Duration
-	Method     string
-	StatusCode int
-	ClientIP   string
-	MsgStr     string
+    SerName    string
+    Path       string
+    Latency    time.Duration
+    Method     string
+    StatusCode int
+    ClientIP   string
+    MsgStr     string
 }
 
 func GinMiddleware(serName string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		t := time.Now()
-		// before request
-		p := c.Request.URL.Path
-		raw := c.Request.URL.RawQuery
-		c.Next()
-		// after request
-		// latency := time.Since(t)
-		// clientIP := c.ClientIP()
-		// method := c.Request.Method
-		// statusCode := c.Writer.Status()
-		if raw != "" {
-			p = p + "?" + raw
-		}
-		msg := c.Errors.String()
-		if msg == "" {
-			msg = "Request"
-		}
-		cData := &ginHands{
-			SerName:    serName,
-			Path:       p,
-			Latency:    time.Since(t),
-			Method:     c.Request.Method,
-			StatusCode: c.Writer.Status(),
-			ClientIP:   c.ClientIP(),
-			MsgStr:     msg,
-		}
+    return func(c *gin.Context) {
+        t := time.Now()
+        // before request
+        p := c.Request.URL.Path
+        raw := c.Request.URL.RawQuery
+        c.Next()
+        // after request
+        // latency := time.Since(t)
+        // clientIP := c.ClientIP()
+        // method := c.Request.Method
+        // statusCode := c.Writer.Status()
+        if raw != "" {
+            p = p + "?" + raw
+        }
+        msg := c.Errors.String()
+        if msg == "" {
+            msg = "Request"
+        }
+        cData := &ginHands{
+            SerName:    serName,
+            Path:       p,
+            Latency:    time.Since(t),
+            Method:     c.Request.Method,
+            StatusCode: c.Writer.Status(),
+            ClientIP:   c.ClientIP(),
+            MsgStr:     msg,
+        }
 
-		logSwitch(cData)
-	}
+        logSwitch(cData)
+    }
 }
 
 func logSwitch(data *ginHands) {
-	switch {
-	case data.StatusCode >= 400 && data.StatusCode < 500:
-		{
-			Logger.Warn().Str("ser_name", data.SerName).Str("method", data.Method).Str("path", data.Path).Dur("resp_time", data.Latency).Int("status", data.StatusCode).Str("client_ip", data.ClientIP).Msg(data.MsgStr)
-		}
-	case data.StatusCode >= 500:
-		{
-			Logger.Error().Str("ser_name", data.SerName).Str("method", data.Method).Str("path", data.Path).Dur("resp_time", data.Latency).Int("status", data.StatusCode).Str("client_ip", data.ClientIP).Msg(data.MsgStr)
-		}
-	default:
-		Logger.Info().Str("ser_name", data.SerName).Str("method", data.Method).Str("path", data.Path).Dur("resp_time", data.Latency).Int("status", data.StatusCode).Str("client_ip", data.ClientIP).Msg(data.MsgStr)
-	}
+    switch {
+    case data.StatusCode >= 400 && data.StatusCode < 500:
+        glog.Warningf("%s|%d|%s|%s|%s|%s|%s", data.SerName,data.StatusCode, data.Method, data.Latency, data.ClientIP, data.Path, data.MsgStr)
+    case data.StatusCode >= 500:
+        glog.Errorf("%s|%d|%s|%s|%s|%s|%s", data.SerName,data.StatusCode, data.Method, data.Latency, data.ClientIP, data.Path, data.MsgStr)
+    default:
+        glog.Infof("%s|%d|%s|%s|%s|%s|%s", data.SerName,data.StatusCode, data.Method, data.Latency, data.ClientIP, data.Path, data.MsgStr)
+    }
 }
