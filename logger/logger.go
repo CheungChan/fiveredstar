@@ -7,18 +7,18 @@ import (
     "time"
 )
 
-
-func InitLog(logDirectory string, rotateSize string,writerColorEnable bool) {
+func InitLog(logDirectory string, rotateSize string, writerColorEnable bool) {
     err := glog.SetConfigWithMap(g.Map{
-        "path":                logDirectory,
-        "file":                "{Y-m-d}.log", // 日志文件格式。默认为"{Y-m-d}.log"
-        "level":               "all",
-        "stdout":              true,
-        "StStatus":            1,
-        "rotateSize":          rotateSize,
-        "rotateExpire":        24 * time.Hour,
-        "writerColorEnable":   writerColorEnable,
+        "path":              logDirectory,
+        "file":              "{Y-m-d}.log", // 日志文件格式。默认为"{Y-m-d}.log"
+        "level":             "all",
+        "stdout":            true,
+        "StStatus":          1,
+        "rotateSize":        rotateSize,
+        "rotateExpire":      24 * time.Hour,
+        "writerColorEnable": writerColorEnable,
     })
+    glog.SetFlags(glog.F_TIME_STD | glog.F_FILE_SHORT)
     if err != nil {
         glog.Error("日志配置错误")
     }
@@ -70,10 +70,10 @@ func GinMiddleware(serName string) gin.HandlerFunc {
 func logSwitch(data *ginHands) {
     switch {
     case data.StatusCode >= 400 && data.StatusCode < 500:
-        glog.Warningf("%s|%d|%s|%s|%s|%s|%s", data.SerName,data.StatusCode, data.Method, data.Latency, data.ClientIP, data.Path, data.MsgStr)
+        glog.Warningf("%s|%d|%s|%s|%s|%s|%s", data.SerName, data.StatusCode, data.Method, data.Latency, data.ClientIP, data.Path, data.MsgStr)
     case data.StatusCode >= 500:
-        glog.Errorf("%s|%d|%s|%s|%s|%s|%s", data.SerName,data.StatusCode, data.Method, data.Latency, data.ClientIP, data.Path, data.MsgStr)
+        glog.Errorf("%s|%d|%s|%s|%s|%s|%s", data.SerName, data.StatusCode, data.Method, data.Latency, data.ClientIP, data.Path, data.MsgStr)
     default:
-        glog.Infof("%s|%d|%s|%s|%s|%s|%s", data.SerName,data.StatusCode, data.Method, data.Latency, data.ClientIP, data.Path, data.MsgStr)
+        glog.Infof("%s|%d|%s|%s|%s|%s|%s", data.SerName, data.StatusCode, data.Method, data.Latency, data.ClientIP, data.Path, data.MsgStr)
     }
 }
