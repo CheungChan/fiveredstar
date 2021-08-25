@@ -53,9 +53,6 @@ func GinMiddleware(serName string) gin.HandlerFunc {
             p = p + "?" + raw
         }
         msg := c.Errors.String()
-        if msg == "" {
-            msg = "Request"
-        }
         cData := &ginHands{
             SerName:    serName,
             Path:       p,
