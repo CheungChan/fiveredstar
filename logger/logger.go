@@ -7,10 +7,13 @@ import (
     "time"
 )
 
-func InitLog(logDirectory string, rotateSize string, writerColorEnable bool) {
+func InitLog(logDirectory string, file string, rotateSize string, writerColorEnable bool) {
+    if file == "" {
+        file = "{Y-m-d}.log"
+    }
     err := glog.SetConfigWithMap(g.Map{
         "path":              logDirectory,
-        "file":              "{Y-m-d}.log", // 日志文件格式。默认为"{Y-m-d}.log"
+        "file":              file, // 日志文件格式。默认为"{Y-m-d}.log"
         "level":             "all",
         "stdout":            true,
         "StStatus":          1,

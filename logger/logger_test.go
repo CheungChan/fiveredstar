@@ -11,12 +11,12 @@ import (
 )
 
 func TestNew(t *testing.T) {
-    InitLog("logs/test_logger", "10M", false)
+    InitLog("logs/", "test_logger.log","10M", false)
     glog.Info("Hello")
     glog.Error(errors.New("这是一个错误,TestNew"))
 }
 func TestGinMiddleware(t *testing.T) {
-    InitLog("logs/test_gin_logger", "10M", true)
+    InitLog("logs/","test_gin_logger.log", "10M", true)
     r := gin.New()
     r.Use(GinMiddleware("test_gin"))
     r.GET("/", func(c *gin.Context) {

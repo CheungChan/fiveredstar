@@ -16,7 +16,7 @@ import (
 
 
 // 脚本日志初始化
-InitLog("logs/test_logger", "10M", false)
+InitLog("logs/","test_logger", "10M", false)
 
 // 打印日志
 glog.Infof("执行%s,超时时间%ds", cmdStr, timeout)
